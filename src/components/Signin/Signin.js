@@ -9,7 +9,7 @@ class Signin extends React.Component{
         }
     }
 
-    onSubmitSignIn=()=>{
+    onSubmitSignIn = () =>{
         fetch('https://immense-ridge-71330.herokuapp.com/signin',{
             method:'post',
             headers:{'Content-Type':'application/json'},
@@ -18,30 +18,30 @@ class Signin extends React.Component{
                 password:this.state.signInPassword
             })
         })
-        .then(response=>response.json())
-        .then(user=>{
+        .then(response => response.json())
+        .then(user =>{
             if(user.id){
                 this.props.loadUser(user);
                 this.props.onRouteChange('home');
             }
         }) 
     }
-    onEmailChange=(event)=>{
+    onEmailChange = (event) =>{
         this.setState({signInEmail:event.target.value})
     }
-    onPasswordChange=(event)=>{
+    onPasswordChange = (event) =>{
         this.setState({signInPassword:event.target.value})
     }
-    onPressEnter=(event)=>{
-        if(event.key==='Enter'){
-         return this.onSubmitSignIn();
+    onPressEnter = (event) =>{
+        if(event.key === 'Enter'){
+            return this.onSubmitSignIn();
         }
     }
 
     
 
     render(){
-        const{onRouteChange}=this.props;
+        const {onRouteChange} = this.props;
         return(
         <article className="br3 ba  b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
             <main className="pa4 black-80">

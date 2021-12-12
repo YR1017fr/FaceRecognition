@@ -27,10 +27,10 @@ const initialstate={
 class App extends Component{
   constructor(){
     super();
-    this.state=initialstate;
+    this.state = initialstate;
   } 
   
-  loadUser=(data)=>{   
+  loadUser = (data) =>{   
       this.setState({user:{
         id:data.id,
         name:data.name,
@@ -39,12 +39,11 @@ class App extends Component{
         joined:data.joined
       }})
   }
-
-  calculateFaceLocation=(data)=>{
-      const face=data.outputs[0].data.regions[0].region_info.bounding_box;
-      const image=document.getElementById('inputImage');
-      const width=Number(image.width);
-      const height=Number(image.height);
+  calculateFaceLocation = (data) =>{
+      const face = data.outputs[0].data.regions[0].region_info.bounding_box;
+      const image = document.getElementById('inputImage');
+      const width = Number(image.width);
+      const height = Number(image.height);
       return{
         leftCol:face.left_col*width,
         topRow:face.top_row*height,
@@ -52,51 +51,48 @@ class App extends Component{
         bottomRow:(1-face.bottom_row)*height
       }
   }
-  displayFaceBox=(box)=>{
-    this.setState({box:box})
+  displayFaceBox = (box) =>{
+    this.setState({box})
   }
-  onInputChange=(event)=>{
+  onInputChange = (event) =>{
     this.setState({input:event.target.value})
   }
-  onImageSubmit = () => {
-    this.setState({imageUrl: this.state.input});
+  onImageSubmit = () =>{
+    const {input,id} = this.state;
+    this.setState({imageUrl: input});
     fetch('https://immense-ridge-71330.herokuapp.com/imageurl',{
       method:'post',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        input:this.state.input
-      })
+      body:JSON.stringify({input})
     })
-      .then(response=>response.json())
-      .then(response =>{
-        if(response){
-          fetch('https://immense-ridge-71330.herokuapp.com/image',{
-            method:'put',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({
-                id:this.state.user.id
-            })
-          })
-          .then(response=>response.json())
-          .then(count=>{
-            this.setState(Object.assign(this.state.user,{entries:count}))
-          })
-          .catch(console.log)
-        }
-        this.displayFaceBox(this.calculateFaceLocation(response))})
-      .catch(err => console.log(err)
-    );
+    .then(response => response.json())
+    .then(response =>{
+      if(response){
+        fetch('https://immense-ridge-71330.herokuapp.com/image',{
+          method:'put',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({id})
+        })
+        .then(response => response.json())
+        .then(count =>{
+          this.setState(Object.assign(this.state.user,{entries:count}))
+        })
+        .catch(console.log)
+      }
+      this.displayFaceBox(this.calculateFaceLocation(response))})
+    .catch(err => console.log(err));
   }
-onRouteChange=(route)=>{
-  if(route==='signin'){
-    this.setState(initialstate)
-  }else if(route==='home'){
+onRouteChange = (route) =>{
+  if(route === 'signin'){
+    const init = JSON.parse(JSON.stringify(initialstate));
+    this.setState(Object.assign(this.state,init));
+  }else if(route === 'home'){
     this.setState({isSignedin:true})
   }
-  this.setState({route:route});
+  this.setState({route});
 }
-onPressEnter=(event)=>{
-  if(event.key==='Enter'){
+onPressEnter = (event) =>{
+  if(event.key === 'Enter'){
       return this.onImageSubmit();
   }
 }
@@ -106,7 +102,8 @@ onPressEnter=(event)=>{
 
 
   render(){
-    const {isSignedin, imageUrl,box,route} = this.state;
+    console.log(this.state.user);
+    const {isSignedin, imageUrl, box, route, } = this.state;
     return(
       <div className='App'>
         <Navigation onRouteChange={this.onRouteChange} isSignedin={isSignedin}/>
@@ -115,7 +112,7 @@ onPressEnter=(event)=>{
               onRouteChange={this.onRouteChange}
               loadUser={this.loadUser}
             />
-          :(route==='home'
+          :(route==='home'  
             ?<div>
                 <Logo/>
                 <Rank

@@ -3,42 +3,39 @@ import React from 'react';
 class Register extends React.Component{
     constructor(props){
         super(props);
-        this.state={
+        this.state = {
             email:'',
             password:'',
             name:'',
         }
     }
 
-    onEmailChange=(event)=>{
+    onEmailChange = (event) =>{
         this.setState({email:event.target.value})
     }
-    onPasswordChange=(event)=>{
+    onPasswordChange = (event) =>{
         this.setState({password:event.target.value})
     }
-    onNameChange=(event)=>{
+    onNameChange = (event) =>{
         this.setState({name:event.target.value})
     }
-    onSubmit=()=>{
+    onSubmit = () =>{
+        let {email,password,name} = this.state;
         fetch('https://immense-ridge-71330.herokuapp.com/register',{
             method:'post',
             headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({
-                email:this.state.email,
-                password:this.state.password,
-                name:this.state.name
-            })
+            body:JSON.stringify({email,password,name})
         })
-        .then(response=>response.json())
-        .then(user=>{
+        .then(response => response.json())
+        .then(user =>{
             if(user.id){
                 this.props.loadUser(user)
                 this.props.onRouteChange('home');
             }
         })
     }
-    onPressEnter=(event)=>{
-        if(event.key==='Enter'){
+    onPressEnter = (event) =>{
+        if(event.key === 'Enter'){
          return this.onSubmit();
         }
       }
