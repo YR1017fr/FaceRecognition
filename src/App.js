@@ -9,7 +9,7 @@ import Signin from './components/Signin/Signin';
 import Register from './components/Register/Register';
 import 'tachyons';
 
-const initialstate={
+const initialstate = {
   input:'',
   imageUrl:'',
   box:{},
@@ -27,7 +27,20 @@ const initialstate={
 class App extends Component{
   constructor(){
     super();
-    this.state = initialstate;
+    this.state = {
+      input:'',
+      imageUrl:'',
+      box:{},
+      route:'signin',  
+      isSignedin:false,
+      user:{
+        id:'',
+        name:'',
+        email:'',
+        entries:0,
+        joined:''
+      }
+    }
   } 
   
   loadUser = (data) =>{   
@@ -40,16 +53,17 @@ class App extends Component{
       }})
   }
   calculateFaceLocation = (data) =>{
-      const face = data.outputs[0].data.regions[0].region_info.bounding_box;
-      const image = document.getElementById('inputImage');
-      const width = Number(image.width);
-      const height = Number(image.height);
-      return{
-        leftCol:face.left_col*width,
-        topRow:face.top_row*height,
-        rightCol:(1-face.right_col)*width,
-        bottomRow:(1-face.bottom_row)*height
-      }
+    console.log(data);
+    const face = data.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById('inputImage');
+    const width = Number(image.width);
+    const height = Number(image.height);
+    return{
+      leftCol:face.left_col*width,
+      topRow:face.top_row*height,
+      rightCol:(1-face.right_col)*width,
+      bottomRow:(1-face.bottom_row)*height
+    }
   }
   displayFaceBox = (box) =>{
     this.setState({box})
@@ -58,7 +72,8 @@ class App extends Component{
     this.setState({input:event.target.value})
   }
   onImageSubmit = () =>{
-    const {input,id} = this.state;
+    const input = this.state.input;
+    const id = this.state.user.id;
     this.setState({imageUrl: input});
     fetch('https://immense-ridge-71330.herokuapp.com/imageurl',{
       method:'post',
@@ -102,7 +117,6 @@ onPressEnter = (event) =>{
 
 
   render(){
-    console.log(this.state.user);
     const {isSignedin, imageUrl, box, route, } = this.state;
     return(
       <div className='App'>
