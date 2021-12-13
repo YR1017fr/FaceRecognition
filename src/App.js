@@ -53,7 +53,6 @@ class App extends Component{
       }})
   }
   calculateFaceLocation = (data) =>{
-    console.log(data);
     const face = data.outputs[0].data.regions[0].region_info.bounding_box;
     const image = document.getElementById('inputImage');
     const width = Number(image.width);
@@ -89,8 +88,8 @@ class App extends Component{
           body:JSON.stringify({id})
         })
         .then(response => response.json())
-        .then(count =>{
-          this.setState(Object.assign(this.state.user,{entries:count}))
+        .then(entries =>{
+          this.setState(Object.assign(this.state.user,{entries}))
         })
         .catch(console.log)
       }
