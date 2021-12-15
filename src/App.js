@@ -7,6 +7,7 @@ import ImageLinkForm from'./components/ImageLinkForm/ImageLinkForm';
 import Recognition from'./components/Recognition/Recognition';
 import Signin from './components/Signin/Signin';
 import Register from './components/Register/Register';
+import Loading from './components/Loading/Loading';
 import 'tachyons';
 
 const initialstate = {
@@ -34,6 +35,7 @@ class App extends Component{
       route:'signin',  
       isSignedin:false,
       isLoad:false,
+      imageLoad:false,
       user:{
         id:'',
         name:'',
@@ -44,17 +46,11 @@ class App extends Component{
     }
   } 
   
-  loadUser = (data) =>{   
-      this.setState({user:{
-        id:data.id,
-        name:data.name,
-        email:data.email,
-        entries:data.entries,
-        joined:data.joined
-      }})
+  loadUser = (user) =>{   
+    this.setState({user});
   }
   calculateFaceLocation = (data) =>{
-    this.setState({isLoad:false});
+    this.setState({imageLoad:false});
     const face = data.outputs[0].data.regions[0].region_info.bounding_box;
     const image = document.getElementById('inputImage');
     const width = Number(image.width);
@@ -67,9 +63,6 @@ class App extends Component{
       bottomRow:(1-face.bottom_row)*height
     }
   }
-  displayFaceBox = (box) =>{
-    this.setState({box})
-  }
   onInputChange = (event) =>{
     this.setState({input:event.target.value})
   }
@@ -77,7 +70,7 @@ class App extends Component{
     const input = this.state.input;
     const id = this.state.user.id;
     this.setState({imageUrl: input});
-    this.setState({isLoad:true},()=>{
+    this.setState({imageLoad:true},()=>{
       const image = document.getElementById('inputImage');
       image.style.display = 'none';
       fetch('https://immense-ridge-71330.herokuapp.com/imageurl',{
@@ -98,7 +91,7 @@ class App extends Component{
           .then(response => response.json())
           .then(entries =>{
             this.setState(Object.assign(this.state.user,{entries}));
-            this.displayFaceBox(this.calculateFaceLocation(response)); 
+            this.setState({box:this.calculateFaceLocation(response)});
           })
           .catch(console.log)
         }
@@ -106,34 +99,47 @@ class App extends Component{
       .catch(err => console.log(err));
     });
   }
-onRouteChange = (route) =>{
-  if(route === 'signin'){
-    const init = JSON.parse(JSON.stringify(initialstate));
-    this.setState(Object.assign(this.state,init));
-  }else if(route === 'home'){
-    this.setState({isSignedin:true})
+  onRouteChange = (route) =>{
+    if(route === 'signin'){
+      const init = JSON.parse(JSON.stringify(initialstate));
+      this.setState(Object.assign(this.state,init));
+    }else if(route === 'home'){
+      this.setState({isSignedin:true})
+    }
+    this.setState({route});
   }
-  this.setState({route});
-}
-onPressEnter = (event) =>{
-  if(event.key === 'Enter'){
-      return this.onImageSubmit();
+  onPressEnter = (event) =>{
+    if(event.key === 'Enter'){
+        return this.onImageSubmit();
+    }
   }
-}
-  
-
-
-
-
+  switchLoad = (state) =>{
+    if(state){
+      this.setState({isLoad:true});
+    }else{
+      this.setState({isLoad:false});
+    }
+  }
   render(){
-    const {isSignedin, imageUrl, box, route, isLoad} = this.state;
+    const {isSignedin, imageUrl, box, route, imageLoad, isLoad} = this.state;
     return(
       <div className='App'>
+        {
+          isLoad
+          ?<div className='loading'>
+            <div className='loading-bk'>
+              <strong>載入中</strong>
+              <Loading isLoad={true} style={{left:'600px',top:'600px'}}/>
+            </div>
+          </div>
+          :<div></div>
+        }
         <Navigation onRouteChange={this.onRouteChange} isSignedin={isSignedin}/>
         {route ==='signin'
           ? <Signin 
               onRouteChange={this.onRouteChange}
               loadUser={this.loadUser}
+              switchLoad={this.switchLoad}
             />
           :(route==='home'  
             ?<div>
@@ -143,9 +149,9 @@ onPressEnter = (event) =>{
                   entries={this.state.user.entries}
                 />          
                 <ImageLinkForm  onInputChange={this.onInputChange} onImageSubmit={this.onImageSubmit} onPressEnter={this.onPressEnter}/>
-                <Recognition box={box} imageUrl={imageUrl} isLoad={isLoad}/>
+                <Recognition box={box} imageUrl={imageUrl} imageLoad={imageLoad}/>
               </div>  
-            :<Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+            :<Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} switchLoad={this.switchLoad}/>
           )
         }        
        

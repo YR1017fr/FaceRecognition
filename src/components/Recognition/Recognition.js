@@ -2,11 +2,11 @@ import React from 'react';
 import './Recognition.css';
 import Loading from '../Loading/Loading';
 
-const Recognition = ({imageUrl, box , isLoad})=>{
+const Recognition = ({imageUrl, box , imageLoad})=>{
     return(
         <div className='center ma'>
             <div className='absolute mt2'> 
-                <Loading isLoad={isLoad}/>
+                <Loading isLoad={imageLoad}/>
                 <img id='inputImage' 
                     alt='' 
                     src={imageUrl}

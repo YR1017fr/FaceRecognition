@@ -20,6 +20,7 @@ class Register extends React.Component{
         this.setState({name:event.target.value})
     }
     onSubmit = () =>{
+        this.props.switchLoad(true);
         let {email,password,name} = this.state;
         fetch('https://immense-ridge-71330.herokuapp.com/register',{
             method:'post',
@@ -32,6 +33,7 @@ class Register extends React.Component{
                 this.props.loadUser(user)
                 this.props.onRouteChange('home');
             }
+            this.props.switchLoad(false);
         })
     }
     onPressEnter = (event) =>{
