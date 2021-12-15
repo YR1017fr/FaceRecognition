@@ -4,7 +4,7 @@ import Navigation from './components/Navigation/Navigation';
 import Logo from'./components/Logo/Logo';
 import Rank from'./components/Rank/Rank';
 import ImageLinkForm from'./components/ImageLinkForm/ImageLinkForm';
-import FaceRecognition from'./components/FaceRecognition/FaceRecognition';
+import Recognition from'./components/Recognition/Recognition';
 import Signin from './components/Signin/Signin';
 import Register from './components/Register/Register';
 import 'tachyons';
@@ -33,6 +33,7 @@ class App extends Component{
       box:{},
       route:'signin',  
       isSignedin:false,
+      isLoad:false,
       user:{
         id:'',
         name:'',
@@ -53,10 +54,12 @@ class App extends Component{
       }})
   }
   calculateFaceLocation = (data) =>{
+    this.setState({isLoad:false});
     const face = data.outputs[0].data.regions[0].region_info.bounding_box;
     const image = document.getElementById('inputImage');
     const width = Number(image.width);
     const height = Number(image.height);
+    image.style.display = 'block';
     return{
       leftCol:face.left_col*width,
       topRow:face.top_row*height,
@@ -74,27 +77,34 @@ class App extends Component{
     const input = this.state.input;
     const id = this.state.user.id;
     this.setState({imageUrl: input});
-    fetch('https://immense-ridge-71330.herokuapp.com/imageurl',{
-      method:'post',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({input})
-    })
-    .then(response => response.json())
-    .then(response =>{
-      if(response){
-        fetch('https://immense-ridge-71330.herokuapp.com/image',{
-          method:'put',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({id})
-        })
-        .then(response => response.json())
-        .then(entries =>{
-          this.setState(Object.assign(this.state.user,{entries}))
-        })
-        .catch(console.log)
-      }
-      this.displayFaceBox(this.calculateFaceLocation(response))})
-    .catch(err => console.log(err));
+    this.setState({isLoad:true},()=>{
+      const image = document.getElementById('inputImage');
+      image.style.display = 'none';
+      fetch('https://immense-ridge-71330.herokuapp.com/imageurl',{
+        method:'post',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({input})
+      })
+      .then(response => response.json())
+      .then(response =>{
+        if(response === '無效網址'){
+          alert('無效/不安全網址');
+        }else if(response){
+          fetch('https://immense-ridge-71330.herokuapp.com/image',{
+            method:'put',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({id})
+          })
+          .then(response => response.json())
+          .then(entries =>{
+            this.setState(Object.assign(this.state.user,{entries}));
+            this.displayFaceBox(this.calculateFaceLocation(response)); 
+          })
+          .catch(console.log)
+        }
+      })
+      .catch(err => console.log(err));
+    });
   }
 onRouteChange = (route) =>{
   if(route === 'signin'){
@@ -116,7 +126,7 @@ onPressEnter = (event) =>{
 
 
   render(){
-    const {isSignedin, imageUrl, box, route, } = this.state;
+    const {isSignedin, imageUrl, box, route, isLoad} = this.state;
     return(
       <div className='App'>
         <Navigation onRouteChange={this.onRouteChange} isSignedin={isSignedin}/>
@@ -133,7 +143,7 @@ onPressEnter = (event) =>{
                   entries={this.state.user.entries}
                 />          
                 <ImageLinkForm  onInputChange={this.onInputChange} onImageSubmit={this.onImageSubmit} onPressEnter={this.onPressEnter}/>
-                <FaceRecognition box={box} imageUrl={imageUrl}/>
+                <Recognition box={box} imageUrl={imageUrl} isLoad={isLoad}/>
               </div>  
             :<Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
           )
