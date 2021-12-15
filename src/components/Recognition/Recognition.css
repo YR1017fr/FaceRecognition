@@ -6,23 +6,3 @@
     justify-content: center;
     cursor: pointer;
 }
-.dot{
-    position: absolute;
-    left: -20px;
-    top: 40px;
-    width: 8px;;
-    height: 8px;
-    border-radius: 50%;
-    background-color: blue;
-    transform: rotate(calc(var(--i)*(360deg/9)))  translate(25px);
-    animation: rotate 0.9s infinite;
-    animation-delay: calc(var(--i)*0.1s);
-}
-@keyframes rotate{
-    0%{
-        opacity: 0;
-    }
-    100%{
-        opacity: 1;
-    }
-}

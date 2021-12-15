@@ -1,25 +1,12 @@
 import React from 'react';
 import './Recognition.css';
+import Loading from '../Loading/Loading';
 
 const Recognition = ({imageUrl, box , isLoad})=>{
     return(
         <div className='center ma'>
             <div className='absolute mt2'> 
-                {
-                    isLoad
-                    ?<div className='flex'>
-                        <div className='dot' style={{"--i":1}}></div>
-                        <div className='dot' style={{"--i":2}}></div>
-                        <div className='dot' style={{"--i":3}}></div>
-                        <div className='dot' style={{"--i":4}}></div>
-                        <div className='dot' style={{"--i":5}}></div>
-                        <div className='dot' style={{"--i":6}}></div>
-                        <div className='dot' style={{"--i":7}}></div>
-                        <div className='dot' style={{"--i":8}}></div>
-                        <div className='dot' style={{"--i":9}}></div>
-                    </div>
-                    :<div></div>
-                }
+                <Loading isLoad={isLoad}/>
                 <img id='inputImage' 
                     alt='' 
                     src={imageUrl}
