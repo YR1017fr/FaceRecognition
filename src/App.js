@@ -129,7 +129,7 @@ class App extends Component{
           ?<div className='loading'>
             <div className='loading-bk'>
               <strong>載入中</strong>
-              <Loading isLoad={true} style={{left:'600px',top:'600px'}}/>
+              <Loading isLoad={true}/>
             </div>
           </div>
           :<div></div>
