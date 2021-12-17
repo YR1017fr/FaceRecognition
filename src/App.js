@@ -82,6 +82,7 @@ class App extends Component{
       .then(response =>{
         if(response === '無效網址'){
           alert('無效/不安全網址');
+          this.switchLoad(false);
         }else if(response){
           fetch('https://immense-ridge-71330.herokuapp.com/image',{
             method:'put',
